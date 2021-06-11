@@ -1,4 +1,3 @@
-import numpy as np
 import pandas as pd
 
 # Point 2
@@ -15,10 +14,9 @@ df_application_server[3] = pd.to_datetime(df_application_server[3], format='%d/%
 df_application_server = df_application_server.drop(labels=[1, 2, 4, 7], axis=1)
 df_application_server = df_application_server.rename(columns={0: "IP", 3: "TIMESTAMP", 5: "REQUEST", 6: "CODE"})
 
-df_merged = pd.merge(df_web_server, df_application_server, on=["IP", "TIMESTAMP", "REQUEST", "CODE"])
-# In this case I'have used also TIMESTAMP column beacuse after a check I'm sure that there aren't differences
-# between timestamps
-# df_merged["TIMESTAMP_DIFF"] = (df_merged["TIMESTAMP_y"] - df_merged["TIMESTAMP_x"]).dt.microseconds
+df_joined = df_web_server.join(df_application_server["TIMESTAMP"], lsuffix="_WS", rsuffix="_AS")
+df_joined["TIME_DELTA"] = (df_joined["TIMESTAMP_AS"] - df_joined["TIMESTAMP_WS"]) / pd.Timedelta(seconds=1)
+print(df_joined.describe())
 
 my_col = [x for x in range(50)]
 df_database_server = pd.read_csv("DATABASE_SERVER.log", sep=' ', header=None, names=my_col)
