@@ -8,15 +8,20 @@ df_web_server[5] = pd.to_datetime(df_web_server[5], format='%d/%b/%Y:%H:%M:%S%z'
 df_web_server = df_web_server.drop(labels=[0, 2, 3, 6, 9, 11, 12], axis=1)
 df_web_server = df_web_server.rename(columns={1: "IP", 4: "ID", 5: "TIMESTAMP", 7: "REQUEST", 8: "CODE", 10: "URL"})
 
+# print(df_web_server)
+
 df_application_server = pd.read_csv("APPLICATION_SERVER.log", sep=' ', header=None)
 df_application_server[3] = (df_application_server[3] + df_application_server[4]).str.strip("[]")
 df_application_server[3] = pd.to_datetime(df_application_server[3], format='%d/%b/%Y:%H:%M:%S%z')
 df_application_server = df_application_server.drop(labels=[1, 2, 4, 7], axis=1)
 df_application_server = df_application_server.rename(columns={0: "IP", 3: "TIMESTAMP", 5: "REQUEST", 6: "CODE"})
 
+# print(df_application_server)
+
 df_joined = df_web_server.join(df_application_server["TIMESTAMP"], lsuffix="_WS", rsuffix="_AS")
 df_joined["TIME_DELTA"] = (df_joined["TIMESTAMP_AS"] - df_joined["TIMESTAMP_WS"]) / pd.Timedelta(seconds=1)
-print(df_joined.describe())
+
+# print(df_joined)
 
 my_col = [x for x in range(50)]
 df_database_server = pd.read_csv("DATABASE_SERVER.log", sep=' ', header=None, names=my_col)
@@ -31,7 +36,32 @@ del_col = [1, 2, 6]
 del_col.extend([n for n in range(7, 50)])
 df_database_server = df_database_server.drop(labels=del_col, axis=1)
 df_database_server = df_database_server.rename(columns={0: "TIMESTAMP", 3: "ID", 4: "DATABASE", 5: "OPERATION"})
-df_database_server = df_database_server[df_database_server.DATABASE == "postgres@infinity41_sp27p"]
+df_database_server = df_database_server[df_database_server.DATABASE == "postgres@infinity41_sp27p"].reset_index()
+
+# print(df_database_server)
+
+#Point 3
+size = len(df_database_server["TIMESTAMP"])
+db_timestamps = []
+for n in range(0, size, 15):
+    try:
+        last_op = df_database_server.at[n+15, 'TIMESTAMP']
+    except:
+        last_op = df_database_server.at[size-1, "TIMESTAMP"]
+    first_op = df_database_server.at[n, "TIMESTAMP"]
+    time_delta = (last_op - first_op) / pd.Timedelta(seconds=1)
+    db_timestamps.append(time_delta)
+
+
+df_joined["TIME_DELTA_DB"] = db_timestamps[:len(df_joined)]
+
+# print(df_joined)
+
+print(df_joined.describe())
+
+
+
+
 
 
 
