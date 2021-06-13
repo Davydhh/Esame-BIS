@@ -1,11 +1,13 @@
 from numpy.core.fromnumeric import var
-import pandas as pd
-import matplotlib.pyplot as plt
 from pm4py.objects.conversion.log import converter as log_converter
 from pm4py.algo.filtering.log.variants import variants_filter
 from pm4py.objects.log.util import interval_lifecycle
 from pm4py.algo.filtering.log.variants import variants_filter
 from math import sqrt
+from random import randint
+
+import pandas as pd
+import matplotlib.pyplot as plt
 
 ## Point 2
 # Since the log files are in a different format, it is necessary to make them compatible with PM4PY before processing them
@@ -154,12 +156,11 @@ performance_analysis(variants_filtered)
 print()
 
 ## Point 6
-for n in range(10):
-    x = performance_drop[0]
-    y = performance_drop["values"]
-    z = (performance_drop[0] - performance_drop["values"][n])/sqrt(performance_drop[0] + performance_drop["values"][n])
+for n in range(50):
+    i = randint(0, len(performance_drop["values"])-1)
+    z = (performance_drop[0] - performance_drop["values"][i])/sqrt(performance_drop[0] + performance_drop["values"][i])
     if z > 1.96:
-        print("Comparing most performance drop variant with variant number {} differences are significantly important".format(n+1))
+        print("Comparing most performance drop variant with variant number {} differences are significantly important".format(i+1))
 
 ## Point 7
 # from pm4py.algo.discovery.dfg import algorithm as dfg_discovery
@@ -170,19 +171,3 @@ for n in range(10):
 # parameters = {dfg_visualization.Variants.PERFORMANCE.value.Parameters.FORMAT: "png"}
 # gviz = dfg_visualization.apply(dfg, log=event_log, variant=dfg_visualization.Variants.PERFORMANCE, parameters=parameters)
 # dfg_visualization.save(gviz, "dfg.png")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
