@@ -1,3 +1,4 @@
+from numpy.core.fromnumeric import var
 import pandas as pd
 import matplotlib.pyplot as plt
 from pm4py.objects.conversion.log import converter as log_converter
@@ -81,7 +82,7 @@ plt.title("Db time delta scatter chart")
 
 # plt.show()
 
-#Remove outliers\
+# Remove outliers
 df_joined_size = len(df_joined)
 df_joined = df_joined[df_joined.TIME_DELTA_DB < 5]
 print("\nPercentage of overdue cases {0:.2g}%\n".format((df_joined_size - len(df_joined)) / size * 100))
@@ -101,6 +102,8 @@ event_log = interval_lifecycle.assign_lead_cycle_time(event_log)
 # print("\nPercentile below the safe performance score 3 sec {}%".format(count / ))
 
 variants = variants_filter.get_variants(event_log)
+
+# print(variants)
 
 print('\nEvents: {} - Cases: {} - Variants: {}'.format(df_joined_size, len(event_log), len(variants)))
 
@@ -128,7 +131,7 @@ def performance_analysis(variants):
         if value < 3:
             count += 1
 
-    print("\nPercentile under 3 sec time delta db {:.2f}%\n".format(count / len(variants_scores) * 100))
+    print("\nPercentile under 3 sec time delta db {:.2f}%".format(count / len(variants_scores) * 100))
 
     # Remove the variant from the dictionary for the later comparison
     for key, value in variants_scores.items():
@@ -148,6 +151,7 @@ variants_filtered = variants_filter.get_variants(filtered_log)
 # print(len(variants_filtered))
 
 performance_analysis(variants_filtered)
+print()
 
 ## Point 6
 for n in range(10):
@@ -158,7 +162,14 @@ for n in range(10):
         print("Comparing most performance drop variant with variant number {} differences are significantly important".format(n+1))
 
 ## Point 7
+# from pm4py.algo.discovery.dfg import algorithm as dfg_discovery
+# dfg = dfg_discovery.apply(event_log)
 
+# from pm4py.visualization.dfg import visualizer as dfg_visualization
+# dfg = dfg_discovery.apply(event_log, variant=dfg_discovery.Variants.PERFORMANCE)
+# parameters = {dfg_visualization.Variants.PERFORMANCE.value.Parameters.FORMAT: "png"}
+# gviz = dfg_visualization.apply(dfg, log=event_log, variant=dfg_visualization.Variants.PERFORMANCE, parameters=parameters)
+# dfg_visualization.save(gviz, "dfg.png")
 
 
 
